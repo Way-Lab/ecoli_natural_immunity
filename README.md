@@ -19,7 +19,7 @@ ecoli_natural_immunity/
 
 ### wgs_analysis/
 
-Shell scripts for E. coli whole genome sequencing analysis pipelines.
+Shell scripts for hybrid assembly of E coli stock and colonizing strains
 
 | Script | Description |
 |--------|-------------|
@@ -46,7 +46,7 @@ Shell scripts for E. coli whole genome sequencing analysis pipelines.
 
 ### snp_analysis/
 
-Python scripts for SNP identification, annotation, and visualization.
+Python scripts for SNP identification, annotation, and visualization between stock and colonizing E. coli isolates
 
 | Script | Description |
 |--------|-------------|
@@ -94,7 +94,7 @@ Python scripts for OmpA outer membrane protein sequence analysis.
 
 ### peptide_analysis/
 
-Python scripts for peptide sequence analysis and conservation studies.
+Python scripts for peptide sequence analysis and conservation across strains and species.
 
 | Script | Description |
 |--------|-------------|
