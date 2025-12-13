@@ -1,4 +1,4 @@
-# E. coli Natural Immunity : Bioinformatic Analysis Scripts
+# E. coli Natural Immunity 
 
 Scripts supporting the publication: **"Natural maternal immunity protects neonates from Escherichia coli sepsis"**
 
