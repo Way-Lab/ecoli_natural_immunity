@@ -37,10 +37,6 @@ Shell scripts for E. coli whole genome sequencing analysis pipelines.
 | `run_comprehensive_plasmid_analysis.sh` | MOB-suite + Bakta plasmid characterization |
 | `run_plasmid_analysis_parallel.sh` | Parallel plasmid analysis processing |
 | `run_bakta_plasmids_only.sh` | Bakta annotation for plasmid sequences |
-| `prepare_haslam_illumina.sh` | Data preparation for Haslam Illumina sequencing |
-| `prepare_haslam_nanopore.sh` | Data preparation for Haslam Nanopore sequencing |
-| `run_haslam_hybrid_assemblies.sh` | Hybrid assemblies for Haslam samples |
-| `run_haslam_comparative_analysis.sh` | Comparative analysis of Haslam samples |
 | `prepare_Z6M7Y5_data.sh` | Data preparation for Z6M7Y5 sample |
 | `run_Z6M7Y5_assembly_qc.sh` | Assembly QC for Z6M7Y5 |
 | `run_Z6M7Y5_complete_workflow.sh` | Complete analysis workflow for Z6M7Y5 |
