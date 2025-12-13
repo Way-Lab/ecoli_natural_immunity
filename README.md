@@ -163,6 +163,16 @@ If you use these scripts, please cite:
 
 > [Authors]. Natural maternal immunity protects neonates from Escherichia coli sepsis. [Journal]. [Year].
 
+## References
+
+- De Coster, W., D'Hert, S., Schultz, D. T., Cruts, M. & Van Broeckhoven, C. NanoPack: visualizing and processing long-read sequencing data. Bioinformatics 34, 2666–2669 (2018). https://doi.org/10.1093/bioinformatics/bty149
+- Bankevich, A. et al. SPAdes: a new genome assembly algorithm and its applications to single-cell sequencing. J Comput Biol 19, 455–477 (2012). https://doi.org/10.1089/cmb.2012.0021
+- Vaser, R., Sovic, I., Nagarajan, N. & Sikic, M. Fast and accurate de novo genome assembly from long uncorrected reads. Genome Res 27, 737–746 (2017). https://doi.org/10.1101/gr.214270.116
+- Wick, R. R., Judd, L. M., Gorrie, C. L. & Holt, K. E. Unicycler: Resolving bacterial genome assemblies from short and long sequencing reads. PLoS Comput Biol 13, e1005595 (2017). https://doi.org/10.1371/journal.pcbi.1005595
+- Gurevich, A., Saveliev, V., Vyahhi, N. & Tesler, G. QUAST: quality assessment tool for genome assemblies. Bioinformatics 29, 1072–1075 (2013). https://doi.org/10.1093/bioinformatics/btt086
+- Katoh, K. & Standley, D. M. MAFFT multiple sequence alignment software version 7: improvements in performance and usability. Mol Biol Evol 30, 772–780 (2013). https://doi.org/10.1093/molbev/mst010
+- Deatherage, D.E., Barrick, J.E. Identification of mutations in laboratory-evolved microbes from next-generation sequencing data using breseq. Methods Mol. Biol. 1151: 165–188 (2014).
+
 ## License
 
 These scripts are provided for reproducibility of the published research.
