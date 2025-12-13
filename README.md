@@ -9,9 +9,9 @@ This repository contains bioinformatics scripts used for whole genome sequencing
 ```
 ecoli_natural_immunity/
 ├── wgs_analysis/       # Whole genome sequencing and assembly pipelines
+│   └── snp_analysis/   # SNP calling and annotation
 ├── ompa_analysis/      # OmpA outer membrane protein analysis
 ├── peptide_analysis/   # Peptide conservation and variability analysis
-├── snp_analysis/       # SNP calling and annotation
 └── utilities/          # FASTA processing and visualization tools
 ```
 
@@ -43,6 +43,33 @@ Shell scripts for E. coli whole genome sequencing analysis pipelines.
 | `run_Z6M7Y5_hybrid_assemblies.sh` | Hybrid assembly for Z6M7Y5 |
 | `run_Z6M7Y5_comparative_analysis.sh` | Comparative analysis of Z6M7Y5 |
 | `run_Z6M7Y5_comparative_analysis_with_refs.sh` | Comparative analysis with additional references |
+
+### snp_analysis/
+
+Python scripts for SNP identification, annotation, and visualization.
+
+| Script | Description |
+|--------|-------------|
+| `analyze_comprehensive_parsnp_snps.py` | Analyze comprehensive parsnp SNP data |
+| `analyze_filtered_parsnp_snps.py` | Analyze filtered parsnp SNPs with annotations |
+| `annotate_snps_with_genes.py` | Annotate SNPs with gene information from Bakta |
+| `annotate_filtered_snps_with_genes.py` | Annotate filtered SNPs with functional impact |
+| `annotate_snp_effects.py` | Determine amino acid changes from SNPs |
+| `create_comprehensive_parsnp_heatmap.py` | Create SNP distance heatmaps |
+| `create_ecn_reference_heatmap.py` | Create heatmap using EcN (Nissle) reference |
+| `create_filtered_heatmap.py` | Create heatmap from filtered SNP data |
+| `create_snp_summary_by_sample.py` | SNP summary statistics by sample |
+| `create_filtered_snp_summary.py` | Summary of filtered SNP data |
+| `create_wide_snp_table.py` | Wide-format SNP table (nucleotide per strain) |
+| `create_nissle_snp_heatmap_from_mapping.py` | Heatmap from Nissle-based mapping |
+| `create_nissle_snp_heatmap_from_parsnp_matrix.py` | Heatmap from parsnp distance matrix |
+| `extract_nissle_snp_distances.py` | Extract SNP distances from Nissle reference |
+| `setup_comprehensive_parsnp_analysis.py` | Configure comprehensive parsnp analysis |
+| `setup_parsnp_with_outgroups.py` | Configure parsnp with outgroups |
+| `rename_parsnp_files.py` | Rename parsnp output files |
+| `analyze_rpoS_gap.py` | Analyze rpoS gene gaps/knockouts |
+| `compare_rpoS.py` | Compare rpoS gene sequences |
+| `all_samples_summary.py` | Generate summary across all samples |
 
 ### ompa_analysis/
 
@@ -79,36 +106,6 @@ Python scripts for peptide sequence analysis and conservation studies.
 | `analyze_species_variants.py` | Analyze peptide variants across bacterial species |
 | `generate_html_report.py` | Generate HTML reports with embedded graphics |
 | `generate_final_summary.py` | Generate final summary report |
-| `create_lpp_alignment_figure.py` | Create Murein lipoprotein (Lpp) alignment figure |
-| `extract_lpp_sequences.py` | Extract Lpp (Braun's lipoprotein) sequences |
-| `compare_lpp_multispecies.py` | Compare Lpp across Enterobacteriaceae species |
-
-### snp_analysis/
-
-Python scripts for SNP identification, annotation, and visualization.
-
-| Script | Description |
-|--------|-------------|
-| `analyze_comprehensive_parsnp_snps.py` | Analyze comprehensive parsnp SNP data |
-| `analyze_filtered_parsnp_snps.py` | Analyze filtered parsnp SNPs with annotations |
-| `annotate_snps_with_genes.py` | Annotate SNPs with gene information from Bakta |
-| `annotate_filtered_snps_with_genes.py` | Annotate filtered SNPs with functional impact |
-| `annotate_snp_effects.py` | Determine amino acid changes from SNPs |
-| `create_comprehensive_parsnp_heatmap.py` | Create SNP distance heatmaps |
-| `create_ecn_reference_heatmap.py` | Create heatmap using EcN (Nissle) reference |
-| `create_filtered_heatmap.py` | Create heatmap from filtered SNP data |
-| `create_snp_summary_by_sample.py` | SNP summary statistics by sample |
-| `create_filtered_snp_summary.py` | Summary of filtered SNP data |
-| `create_wide_snp_table.py` | Wide-format SNP table (nucleotide per strain) |
-| `create_nissle_snp_heatmap_from_mapping.py` | Heatmap from Nissle-based mapping |
-| `create_nissle_snp_heatmap_from_parsnp_matrix.py` | Heatmap from parsnp distance matrix |
-| `extract_nissle_snp_distances.py` | Extract SNP distances from Nissle reference |
-| `setup_comprehensive_parsnp_analysis.py` | Configure comprehensive parsnp analysis |
-| `setup_parsnp_with_outgroups.py` | Configure parsnp with outgroups |
-| `rename_parsnp_files.py` | Rename parsnp output files |
-| `analyze_rpoS_gap.py` | Analyze rpoS gene gaps/knockouts |
-| `compare_rpoS.py` | Compare rpoS gene sequences |
-| `all_samples_summary.py` | Generate summary across all samples |
 
 ### utilities/
 
@@ -131,8 +128,6 @@ General-purpose scripts for FASTA processing and visualization.
 | `visualize_tree.py` | Visualize phylogenetic trees |
 | `visualize_final_tree.py` | Visualize final phylogenetic tree |
 | `visualize_strains_tree.py` | Visualize strain-specific trees |
-| `extract_mlp_comprehensive.py` | Extract Murein lipoprotein via tBLASTn |
-| `compare_mlp_all_strains.py` | Compare Murein lipoprotein across strains |
 
 ## Software Dependencies
 
@@ -161,7 +156,7 @@ General-purpose scripts for FASTA processing and visualization.
 
 > Diep, R.E., et al.. Natural maternal immunity protects neonates from Escherichia coli sepsis. 2025.
 
-## References
+## Software Citations
 
 - De Coster, W., D'Hert, S., Schultz, D. T., Cruts, M. & Van Broeckhoven, C. NanoPack: visualizing and processing long-read sequencing data. Bioinformatics 34, 2666–2669 (2018). https://doi.org/10.1093/bioinformatics/bty149
 - Bankevich, A. et al. SPAdes: a new genome assembly algorithm and its applications to single-cell sequencing. J Comput Biol 19, 455–477 (2012). https://doi.org/10.1089/cmb.2012.0021
