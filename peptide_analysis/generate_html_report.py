@@ -796,7 +796,7 @@ def create_html_report():
 
         <footer>
             <p><strong>OmpA Peptide Variability Analysis Report</strong></p>
-            <p>Analysis Date: October 30, 2025</p>
+            <p>Analysis Date: Autumn 2025</p>
             <p>Total Sequences: 130 | Species: 12 | Peptides Analyzed: 13</p>
         </footer>
     </div>
