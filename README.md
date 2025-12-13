@@ -159,9 +159,7 @@ General-purpose scripts for FASTA processing and visualization.
 
 ## Citation
 
-If you use these scripts, please cite:
-
-> [Authors]. Natural maternal immunity protects neonates from Escherichia coli sepsis. [Journal]. [Year].
+> Diep, R.E., et al.. Natural maternal immunity protects neonates from Escherichia coli sepsis. 2025.
 
 ## References
 
