@@ -1,8 +1,8 @@
-# E. coli Natural Immunity 
+# *E. coli* Natural Immunity 
 
-Scripts supporting the publication: **"Natural maternal immunity protects neonates from Escherichia coli sepsis"**
+Scripts supporting the publication: **"Natural maternal immunity protects neonates from *Escherichia coli* sepsis"**
 
-This repository contains bioinformatics scripts used for whole genome sequencing (WGS) analysis, OmpA protein analysis, and peptide conservation studies of *Escherichia coli* strains.
+This repository contains bioinformatics scripts used for whole genome sequencing (WGS) analysis, OmpA protein analysis, and peptide homology studies of *Escherichia coli* strains.
 
 ## Repository Structure
 
