@@ -8,11 +8,12 @@ This repository contains bioinformatics scripts used for whole genome sequencing
 
 ```
 ecoli_natural_immunity/
-├── wgs_analysis/       # Whole genome sequencing and assembly pipelines
-│   └── snp_analysis/   # SNP calling and annotation
-├── ompa_analysis/      # OmpA outer membrane protein analysis
-├── peptide_analysis/   # Peptide conservation and variability analysis
-└── utilities/          # FASTA processing and visualization tools
+├── wgs_analysis/           # Whole genome sequencing and assembly pipelines
+│   └── snp_analysis/       # SNP calling and annotation
+├── ompa_analysis/          # OmpA outer membrane protein analysis
+├── peptide_analysis/       # Peptide conservation and variability analysis
+├── statistical_analysis/   # Case-control statistical analysis
+└── utilities/              # FASTA processing and visualization tools
 ```
 
 ## Directory Contents
@@ -107,6 +108,14 @@ Python scripts for peptide sequence analysis and conservation across strains and
 | `generate_html_report.py` | Generate HTML reports with embedded graphics |
 | `generate_final_summary.py` | Generate final summary report |
 
+### statistical_analysis/
+
+Python scripts for statistical analysis of maternal antibody levels and neonatal sepsis risk.
+
+| Script | Description |
+|--------|-------------|
+| `logistic_regression_case_control.py` | Matched case-control analysis of maternal antibodies using conditional logistic regression. Analyzes THP-1 opsonization, HL60 opsonization, Mix8 IgG, and OmpA IgG assays. Calculates protective thresholds with bootstrap confidence intervals. |
+
 ### utilities/
 
 General-purpose scripts for FASTA processing and visualization.
@@ -151,6 +160,8 @@ General-purpose scripts for FASTA processing and visualization.
 - numpy
 - matplotlib
 - seaborn
+- statsmodels
+- scipy
 
 ## Citation
 
