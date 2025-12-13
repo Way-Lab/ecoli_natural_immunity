@@ -31,8 +31,6 @@ Shell scripts for hybrid assembly of E coli stock and colonizing strains
 | `run_parsnp_with_outgroups.sh` | Parsnp analysis including outgroup reference strains |
 | `run_parsnp_without_duplicate.sh` | Parsnp variant excluding duplicate samples |
 | `run_comprehensive_parsnp.sh` | Comprehensive parsnp run with full strain collection |
-| `run_snippy_core_analysis.sh` | Snippy core genome SNP analysis pipeline |
-| `run_snippy_nissle_refseq.sh` | Snippy analysis against Nissle 1917 RefSeq reference |
 | `run_breseq_analysis.sh` | Breseq analysis for identifying mutations in variant strains |
 | `run_all_breseq.sh` | Parallel breseq execution across multiple samples |
 | `run_comprehensive_plasmid_analysis.sh` | MOB-suite + Bakta plasmid characterization |
@@ -147,7 +145,6 @@ General-purpose scripts for FASTA processing and visualization.
 
 ### Comparative Genomics
 - [Parsnp](https://harvest.readthedocs.io/) - Core genome alignment
-- [Snippy](https://github.com/tseemann/snippy) - SNP calling
 - [Breseq](https://barricklab.org/breseq) - Mutation identification
 
 ### Annotation
