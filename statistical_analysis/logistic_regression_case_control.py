@@ -695,7 +695,152 @@ def generate_predictions_standard_logistic(df_long: pd.DataFrame, n_bootstrap: i
     return ab_range, prob_pred, prob_lower, prob_upper, successful_boots
 
 
-def create_figure(config: AssayConfig, df_long: pd.DataFrame, 
+def create_figure_or_rrr(config: AssayConfig, df_long: pd.DataFrame,
+                          ab_range: np.ndarray, result, n_bootstrap: int = 1000):
+    """Create figure with Odds Ratio and Relative Risk Reduction curves.
+
+    These metrics are more interpretable for case-control studies than
+    absolute probability, which depends on the sampling ratio.
+    """
+    coef = result.params['log_antibody']
+    log_ab_range = np.log10(ab_range)
+
+    # Use minimum value as reference (low antibody = high risk baseline)
+    reference_ab = df_long['antibody'].min()
+    log_reference = np.log10(reference_ab)
+
+    # Calculate Odds Ratio relative to reference
+    # OR = exp(coef * (log_ab - log_reference))
+    # At reference: OR = 1.0
+    # As antibody increases (and coef is negative): OR decreases
+    or_pred = np.exp(coef * (log_ab_range - log_reference))
+
+    # Calculate Relative Risk Reduction
+    # RRR = (1 - OR) * 100 when OR < 1 (protective)
+    # Capped at 0-100% range
+    rrr_pred = np.clip((1 - or_pred) * 100, 0, 100)
+
+    # Bootstrap for confidence intervals
+    np.random.seed(42)
+    or_boot = np.zeros((len(ab_range), n_bootstrap))
+
+    for i in range(n_bootstrap):
+        match_ids = df_long['match_id'].unique()
+        boot_match_ids = np.random.choice(match_ids, size=len(match_ids), replace=True)
+
+        boot_data = []
+        for new_id, orig_match_id in enumerate(boot_match_ids):
+            matched_set = df_long[df_long['match_id'] == orig_match_id].copy()
+            matched_set['match_id'] = new_id
+            boot_data.append(matched_set)
+
+        df_boot = pd.concat(boot_data, ignore_index=True)
+
+        try:
+            model_boot = ConditionalLogit(
+                endog=df_boot['outcome'],
+                exog=df_boot[['log_antibody']],
+                groups=df_boot['match_id']
+            )
+            result_boot = model_boot.fit(method='bfgs', maxiter=100, disp=False)
+            coef_boot = result_boot.params['log_antibody']
+            or_boot[:, i] = np.exp(coef_boot * (log_ab_range - log_reference))
+        except Exception:
+            or_boot[:, i] = or_pred
+
+    or_lower = np.percentile(or_boot, 2.5, axis=1)
+    or_upper = np.percentile(or_boot, 97.5, axis=1)
+    rrr_lower = np.clip((1 - or_upper) * 100, 0, 100)  # Note: inverted for RRR
+    rrr_upper = np.clip((1 - or_lower) * 100, 0, 100)
+
+    # Create 3-panel figure
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18, 8),
+                                         gridspec_kw={'width_ratios': [0.5, 1, 1]})
+
+    # Panel A: Distribution (same as original)
+    np.random.seed(42)
+    cases_data = df_long[df_long['outcome'] == 1]['antibody']
+    controls_data = df_long[df_long['outcome'] == 0]['antibody']
+
+    jitter_amount = 0.1
+    x_controls = np.random.normal(0, jitter_amount, size=len(controls_data))
+    x_cases = np.random.normal(1, jitter_amount, size=len(cases_data))
+
+    ax1.scatter(x_controls, controls_data, alpha=0.6, s=40,
+               color=CONTROL_COLOR, edgecolors='black', linewidth=0.5,
+               label=f'Controls (n={len(controls_data)})')
+    ax1.scatter(x_cases, cases_data, alpha=0.6, s=40,
+               color=CASE_COLOR, edgecolors='black', linewidth=0.5,
+               label=f'Cases (n={len(cases_data)})')
+
+    ax1.hlines(stats.gmean(controls_data), -0.2, 0.2,
+              colors='black', linewidth=3, label='Geometric mean')
+    ax1.hlines(stats.gmean(cases_data), 0.8, 1.2,
+              colors='black', linewidth=3)
+
+    ax1.set_yscale('log')
+    ax1.set_ylim(bottom=10**config.y_axis_bottom)
+    ax1.set_xlim(-0.5, 1.5)
+    ax1.set_xticks([0, 1])
+    ax1.set_xticklabels(['Control', r'$\it{E. coli}$' + '\nsepsis'], fontsize=16, fontweight='bold')
+    ax1.set_ylabel(config.y_axis_label, fontsize=16, fontweight='bold')
+    ax1.tick_params(axis='y', labelsize=14)
+    ax1.grid(True, alpha=0.3, axis='y')
+    ax1.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), frameon=True, fontsize=11, ncol=1)
+    ax1.set_title('A. Antibody Distribution', fontsize=18, fontweight='bold', pad=10)
+
+    # Panel B: Odds Ratio
+    ax2.fill_between(ab_range, or_lower, or_upper,
+                    alpha=0.3, color='steelblue', label='95% CI', edgecolor='none')
+    ax2.plot(ab_range, or_pred, 'b-', linewidth=2.5, label='Odds Ratio')
+    ax2.axhline(y=1.0, color='gray', linestyle='--', linewidth=1.5, label='Reference (OR=1)')
+    ax2.axvline(x=reference_ab, color='red', linestyle=':', linewidth=1.5,
+                label=f'Reference: {reference_ab:.0f}')
+
+    ax2.set_xlabel(config.y_axis_label, fontsize=16, fontweight='bold')
+    ax2.set_ylabel('Odds Ratio\n(relative to minimum)', fontsize=16, fontweight='bold')
+    ax2.tick_params(axis='both', labelsize=14)
+    ax2.set_xlim(0, config.x_axis_max)
+    ax2.set_ylim(0, 1.5)
+    ax2.grid(True, alpha=0.3)
+    ax2.legend(loc='upper right', frameon=True, fontsize=11)
+    ax2.set_title('B. Odds Ratio vs Antibody Level', fontsize=18, fontweight='bold', pad=10)
+
+    # Panel C: Relative Risk Reduction
+    ax3.fill_between(ab_range, rrr_lower, rrr_upper,
+                    alpha=0.3, color='darkgreen', label='95% CI', edgecolor='none')
+    ax3.plot(ab_range, rrr_pred, 'g-', linewidth=2.5, label='Risk Reduction')
+    ax3.axhline(y=50, color='orange', linestyle='--', linewidth=1.5, alpha=0.7, label='50% reduction')
+    ax3.axhline(y=80, color='red', linestyle='--', linewidth=1.5, alpha=0.7, label='80% reduction')
+
+    # Mark threshold for 50% and 80% reduction
+    idx_50 = np.argmin(np.abs(rrr_pred - 50))
+    idx_80 = np.argmin(np.abs(rrr_pred - 80))
+    if rrr_pred[idx_50] >= 45:  # Only show if we achieve near 50%
+        ax3.axvline(x=ab_range[idx_50], color='orange', linestyle=':', linewidth=1.5, alpha=0.7)
+    if rrr_pred[idx_80] >= 75:  # Only show if we achieve near 80%
+        ax3.axvline(x=ab_range[idx_80], color='red', linestyle=':', linewidth=1.5, alpha=0.7)
+
+    ax3.set_xlabel(config.y_axis_label, fontsize=16, fontweight='bold')
+    ax3.set_ylabel('Relative Risk Reduction (%)\n(vs minimum)', fontsize=16, fontweight='bold')
+    ax3.tick_params(axis='both', labelsize=14)
+    ax3.set_xlim(0, config.x_axis_max)
+    ax3.set_ylim(0, 100)
+    ax3.grid(True, alpha=0.3)
+    ax3.legend(loc='lower right', frameon=True, fontsize=11)
+    ax3.set_title('C. Relative Risk Reduction', fontsize=18, fontweight='bold', pad=10)
+
+    plt.tight_layout()
+
+    # Save with modified filename
+    output_file = config.output_figure.replace('.pdf', '_OR_RRR.pdf')
+    plt.savefig(output_file, dpi=FIGURE_DPI, bbox_inches='tight')
+    plt.close()
+
+    return output_file, reference_ab, or_pred, rrr_pred
+
+
+def create_figure(config: AssayConfig, df_long: pd.DataFrame,
                   ab_range: np.ndarray, prob_pred: np.ndarray,
                   prob_lower: np.ndarray, prob_upper: np.ndarray):
     """Create publication-quality two-panel figure."""
@@ -850,19 +995,33 @@ def run_analysis(config: AssayConfig, verbose: bool = True):
     if verbose:
         print(f"  Bootstrap success rate: {successful_boots}/1000")
     
-    # Create figure
+    # Create figures
     if verbose:
-        print("\nGenerating figure...")
+        print("\nGenerating figures...")
     create_figure(config, df_long, ab_range, prob_pred, prob_lower, prob_upper)
-    
+
+    # Create OR/RRR figure (more interpretable for case-control)
+    if verbose:
+        print("Generating Odds Ratio / Risk Reduction figure...")
+    or_rrr_file, reference_ab, or_pred, rrr_pred = create_figure_or_rrr(
+        config, df_long, ab_range, result
+    )
+
     # Save summary
     baseline_risk = df_long['outcome'].mean()
     save_summary(config, desc_stats, matched_diffs, result, ab_range, prob_pred, baseline_risk)
-    
+
     if verbose:
         print(f"\nOutputs generated:")
         print(f"  - {config.output_figure}")
+        print(f"  - {or_rrr_file}")
         print(f"  - {config.output_summary}")
+        print(f"\nOR/RRR interpretation (reference = minimum: {reference_ab:.1f}):")
+        # Find key thresholds
+        idx_50 = np.argmin(np.abs(rrr_pred - 50))
+        idx_80 = np.argmin(np.abs(rrr_pred - 80))
+        print(f"  50% risk reduction at: {ab_range[idx_50]:.1f}")
+        print(f"  80% risk reduction at: {ab_range[idx_80]:.1f}")
     
     return {
         'config': config,

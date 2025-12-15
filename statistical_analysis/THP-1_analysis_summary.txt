@@ -1,0 +1,27 @@
+MATCHED CASE-CONTROL ANTIBODY ANALYSIS SUMMARY - THP-1
+======================================================================
+
+SAMPLE SIZE:
+  Cases: 100
+  Controls: 296
+  Matched sets: 100
+
+DESCRIPTIVE STATISTICS:
+  Cases - Geometric mean: 23.9
+  Controls - Geometric mean: 96.0
+  Geometric mean ratio: 4.009
+
+CONDITIONAL LOGISTIC REGRESSION:
+  Coefficient: -3.805 (SE: 0.533)
+  95% CI: [-4.850, -2.761]
+  P-value: 9.2511e-13
+
+ODDS RATIOS:
+  Per 10-fold increase: 0.022
+  Per 2-fold increase: 0.318
+
+PROTECTIVE THRESHOLDS:
+  50% risk reduction: 122.4
+  75% risk reduction: 196.3
+  90% risk reduction: 351.9
+  95% risk reduction: 533.9
