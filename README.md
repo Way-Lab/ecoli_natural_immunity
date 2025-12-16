@@ -345,31 +345,6 @@ General-purpose scripts for FASTA processing and visualization.
 | `remove_sequences.py` | Remove specific sequences from FASTA |
 | `remove_sequences_from_processed.py` | Remove sequences from processed files |
 
----
-
-## Reproducing Manuscript Results
-
-The following scripts generate the key results presented in the manuscript:
-
-### Statistical Figures (Antibody Analysis)
-
-| Manuscript Figure | Script | Command |
-|-------------------|--------|---------|
-| Fig. 5a-b (THP-1) | `statistical_analysis/logistic_regression_case_control.py` | `python logistic_regression_case_control.py --assay THP1` |
-| Fig. 5c-d (HL60) | `statistical_analysis/logistic_regression_case_control.py` | `python logistic_regression_case_control.py --assay HL60` |
-| Extended Data (Mix8) | `statistical_analysis/logistic_regression_case_control.py` | `python logistic_regression_case_control.py --assay Mix8` |
-| Extended Data (OmpA) | `statistical_analysis/logistic_regression_case_control.py` | `python logistic_regression_case_control.py --assay OmpA` |
-
-### Genomic Analysis
-
-| Analysis | Scripts | Description |
-|----------|---------|-------------|
-| Phylogenetic trees | `wgs_analysis/run_parsnp_analysis.sh` | Core genome alignment and tree construction |
-| SNP analysis | `snp_analysis/create_comprehensive_parsnp_heatmap.py` | SNP distance heatmaps |
-| OmpA conservation | `ompa_analysis/visualize_peptide_conservation.py` | Peptide loop conservation across species |
-| Strain comparisons | `snp_analysis/annotate_snp_effects.py` | Functional SNP annotations |
-
----
 
 ## Citation
 
