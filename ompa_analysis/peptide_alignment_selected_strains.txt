@@ -1,0 +1,107 @@
+====================================================================================================
+OmpA PEPTIDE LOOP REGIONS - SELECTED STRAINS COMPARISON
+====================================================================================================
+
+Total sequences: 9
+E. coli strains: EcN, RS218, UTI189
+Other species: C. koseri, E. cloacae, K. pneumoniae, S. Typhimurium (2 strains), Y. enterocolitica
+Alignment: MAFFT
+Format: '.' = match to reference, letter = difference, '-' = gap
+
+====================================================================================================
+Peptide_1: WSQYHDTGFINNNGPTHEN (reference: RS218)
+====================================================================================================
+Strain                         WSQYHDTGFI------NNNGPTHEN
+------------------------------ -------------------------
+EcN                            ..........------P........
+RS218                          WSQYHDTGFI------NNNGPTHEN
+UTI189                         ..........------.........
+C.koseri_BAA-895               -------------------------
+E.cloacae_ATCC13047            ...F....WY--NSAN..D.....S
+K.pneumoniae_ATCC43816         .........YG-NGFQ......RND
+S.Typhimurium_14028S           ..........------H.D......
+S.Typhimurium_SL1344           ..........------H.D......
+Y.enterocolitica_JB580v        ....QN..TGGIYGDQG.D....KD
+
+====================================================================================================
+Peptide_2: GRMPYKGSVENGAYKA (reference: RS218)
+====================================================================================================
+Strain                         GRMPYKGSVENGAYKA
+------------------------------ ----------------
+EcN                            .......DNI......
+RS218                          GRMPYKGSVENGAYKA
+UTI189                         ................
+C.koseri_BAA-895               .---------------
+E.cloacae_ATCC13047            .......NET...F..
+K.pneumoniae_ATCC43816         ...A.....D...F..
+S.Typhimurium_14028S           .......DNI......
+S.Typhimurium_SL1344           .......DNI......
+Y.enterocolitica_JB580v        .......D.R..DF..
+
+====================================================================================================
+Peptide_2b: GRMPYKGDNINGAYKA (reference: EcN)
+====================================================================================================
+Strain                         GRMPYKGDNINGAYKA
+------------------------------ ----------------
+EcN                            GRMPYKGDNINGAYKA
+RS218                          .......SVE......
+UTI189                         .......SVE......
+C.koseri_BAA-895               .---------------
+E.cloacae_ATCC13047            .......NET...F..
+K.pneumoniae_ATCC43816         ...A...SVD...F..
+S.Typhimurium_14028S           ................
+S.Typhimurium_SL1344           ................
+Y.enterocolitica_JB580v        ........VR..DF..
+
+====================================================================================================
+Peptide_3a: KSNVYGKN (reference: RS218)
+====================================================================================================
+Strain                         KSNVYG-----KN
+------------------------------ -------------
+EcN                            .A..P.-GASF.D
+RS218                          KSNVYG-----KN
+UTI189                         ......-----..
+C.koseri_BAA-895               SKKDR.-----.G
+E.cloacae_ATCC13047            SNSNA.-----DD
+K.pneumoniae_ATCC43816         .G.YASTGVSRSE
+S.Typhimurium_14028S           ....P.-GPST.D
+S.Typhimurium_SL1344           ....P.-GPST.D
+Y.enterocolitica_JB580v        SAFDATTGARAN.
+
+====================================================================================================
+Peptide_3b: KANVPGGASFKD (reference: EcN)
+====================================================================================================
+Strain                         KANVPG-GASFKD
+------------------------------ -------------
+EcN                            KANVPG-GASFKD
+RS218                          .S..Y.-----.N
+UTI189                         .S..Y.-----.N
+C.koseri_BAA-895               SKKDR.-----.G
+E.cloacae_ATCC13047            SNSNA.-----D.
+K.pneumoniae_ATCC43816         .G.YAST.V.RSE
+S.Typhimurium_14028S           .S....-.P.T..
+S.Typhimurium_SL1344           .S....-.P.T..
+Y.enterocolitica_JB580v        S.FDATT..RANN
+
+====================================================================================================
+Peptide_4: TNNIGDAHTIGTRPDNGM (reference: RS218)
+====================================================================================================
+Strain                         TNNIGDAHTIGTRPDNGM
+------------------------------ ------------------
+EcN                            ..................
+RS218                          TNNIGDAHTIGTRPDNGM
+UTI189                         ..................
+C.koseri_BAA-895               ----.TGVSVTRSG..II
+E.cloacae_ATCC13047            V.....GA.V.V......
+K.pneumoniae_ATCC43816         V......G.V........
+S.Typhimurium_14028S           .......N.........L
+S.Typhimurium_SL1344           .......N.........L
+Y.enterocolitica_JB580v        VS....KA.V.A......
+
+====================================================================================================
+
+KEY:
+  '.' = Matches reference sequence
+  Letter = Differs from reference
+  '-' = Gap in alignment
+====================================================================================================

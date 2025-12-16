@@ -51,7 +51,7 @@ class AssayConfig:
     y_axis_label: str
     y_axis_bottom: float  # 10^x for log scale bottom
     x_axis_max: float     # Upper limit for probability curve panel
-    use_standard_logistic_for_viz: bool = False  # HL60 uses different method
+    use_standard_logistic: bool = False  # Use standard (not conditional) logistic regression
 
 # =============================================================================
 # ASSAY DATA AND CONFIGURATIONS
@@ -497,7 +497,7 @@ ASSAY_CONFIGS = {
         y_axis_label='anti-E. coli opsonization activity (HL60 cells)',
         y_axis_bottom=0,  # 10^0
         x_axis_max=500,
-        use_standard_logistic_for_viz=True,
+        use_standard_logistic=True,  # Use standard logistic (conditional doesn't converge)
     ),
     'OmpA': AssayConfig(
         name='OmpA',
@@ -597,6 +597,36 @@ def fit_conditional_logistic(df_long: pd.DataFrame):
         groups=df_long['match_id']
     )
     return model.fit(method='bfgs', maxiter=100, disp=False)
+
+
+def fit_standard_logistic(df_long: pd.DataFrame):
+    """Fit standard logistic regression model.
+
+    Used when conditional logistic regression doesn't converge well
+    (e.g., HL60 data with separation issues).
+    """
+    X = sm.add_constant(df_long['log_antibody'])
+    model = sm.Logit(df_long['outcome'], X)
+    result = model.fit(disp=False)
+
+    # Create a wrapper to match conditional logistic interface
+    class StandardLogitResult:
+        def __init__(self, result):
+            self._result = result
+            # Map 'log_antibody' to the coefficient (index 1, after constant)
+            self.params = pd.Series({'log_antibody': result.params.iloc[1]})
+            self.bse = pd.Series({'log_antibody': result.bse.iloc[1]})
+            self.pvalues = pd.Series({'log_antibody': result.pvalues.iloc[1]})
+            self._conf_int = result.conf_int()
+
+        def conf_int(self):
+            # Return confidence interval for log_antibody coefficient
+            return pd.DataFrame({
+                0: {'log_antibody': self._conf_int.iloc[1, 0]},
+                1: {'log_antibody': self._conf_int.iloc[1, 1]}
+            })
+
+    return StandardLogitResult(result)
 
 
 def generate_predictions_conditional(df_long: pd.DataFrame, result, n_bootstrap: int = 1000):
@@ -725,25 +755,37 @@ def create_figure_or_rrr(config: AssayConfig, df_long: pd.DataFrame,
     or_boot = np.zeros((len(ab_range), n_bootstrap))
 
     for i in range(n_bootstrap):
-        match_ids = df_long['match_id'].unique()
-        boot_match_ids = np.random.choice(match_ids, size=len(match_ids), replace=True)
+        if config.use_standard_logistic:
+            # Simple bootstrap for standard logistic
+            boot_idx = np.random.choice(len(df_long), size=len(df_long), replace=True)
+            df_boot = df_long.iloc[boot_idx]
+        else:
+            # Matched set bootstrap for conditional logistic
+            match_ids = df_long['match_id'].unique()
+            boot_match_ids = np.random.choice(match_ids, size=len(match_ids), replace=True)
 
-        boot_data = []
-        for new_id, orig_match_id in enumerate(boot_match_ids):
-            matched_set = df_long[df_long['match_id'] == orig_match_id].copy()
-            matched_set['match_id'] = new_id
-            boot_data.append(matched_set)
+            boot_data = []
+            for new_id, orig_match_id in enumerate(boot_match_ids):
+                matched_set = df_long[df_long['match_id'] == orig_match_id].copy()
+                matched_set['match_id'] = new_id
+                boot_data.append(matched_set)
 
-        df_boot = pd.concat(boot_data, ignore_index=True)
+            df_boot = pd.concat(boot_data, ignore_index=True)
 
         try:
-            model_boot = ConditionalLogit(
-                endog=df_boot['outcome'],
-                exog=df_boot[['log_antibody']],
-                groups=df_boot['match_id']
-            )
-            result_boot = model_boot.fit(method='bfgs', maxiter=100, disp=False)
-            coef_boot = result_boot.params['log_antibody']
+            if config.use_standard_logistic:
+                X_boot = sm.add_constant(df_boot['log_antibody'])
+                model_boot = sm.Logit(df_boot['outcome'], X_boot)
+                result_boot = model_boot.fit(disp=False)
+                coef_boot = result_boot.params.iloc[1]  # log_antibody coefficient
+            else:
+                model_boot = ConditionalLogit(
+                    endog=df_boot['outcome'],
+                    exog=df_boot[['log_antibody']],
+                    groups=df_boot['match_id']
+                )
+                result_boot = model_boot.fit(method='bfgs', maxiter=100, disp=False)
+                coef_boot = result_boot.params['log_antibody']
             or_boot[:, i] = np.exp(coef_boot * (log_ab_range - log_reference))
         except Exception:
             or_boot[:, i] = or_pred
@@ -897,7 +939,7 @@ def create_figure(config: AssayConfig, df_long: pd.DataFrame,
 
 
 def save_summary(config: AssayConfig, desc_stats: dict, matched_diffs: np.ndarray,
-                 result, ab_range: np.ndarray, prob_pred: np.ndarray, 
+                 result, ab_range: np.ndarray, prob_pred: np.ndarray,
                  baseline_risk: float):
     """Save analysis summary to text file."""
     coef = result.params['log_antibody']
@@ -907,22 +949,24 @@ def save_summary(config: AssayConfig, desc_stats: dict, matched_diffs: np.ndarra
     p_value = result.pvalues['log_antibody']
     or_10fold = np.exp(coef)
     or_2fold = np.exp(coef * np.log10(2))
-    
+
+    regression_type = "STANDARD LOGISTIC REGRESSION" if config.use_standard_logistic else "CONDITIONAL LOGISTIC REGRESSION"
+
     with open(config.output_summary, 'w') as f:
         f.write(f"MATCHED CASE-CONTROL ANTIBODY ANALYSIS SUMMARY - {config.name}\n")
         f.write("=" * 70 + "\n\n")
-        
+
         f.write("SAMPLE SIZE:\n")
         f.write(f"  Cases: {len(desc_stats['cases'])}\n")
         f.write(f"  Controls: {len(desc_stats['controls'])}\n")
         f.write(f"  Matched sets: {len(matched_diffs)}\n\n")
-        
+
         f.write("DESCRIPTIVE STATISTICS:\n")
         f.write(f"  Cases - Geometric mean: {desc_stats['cases_gmean']:.1f}\n")
         f.write(f"  Controls - Geometric mean: {desc_stats['controls_gmean']:.1f}\n")
         f.write(f"  Geometric mean ratio: {desc_stats['gmr']:.3f}\n\n")
-        
-        f.write("CONDITIONAL LOGISTIC REGRESSION:\n")
+
+        f.write(f"{regression_type}:\n")
         f.write(f"  Coefficient: {coef:.3f} (SE: {se:.3f})\n")
         f.write(f"  95% CI: [{ci_lower:.3f}, {ci_upper:.3f}]\n")
         f.write(f"  P-value: {p_value:.4e}\n\n")
@@ -963,19 +1007,24 @@ def run_analysis(config: AssayConfig, verbose: bool = True):
         print(f"  Cases - Geometric mean: {desc_stats['cases_gmean']:.1f}")
         print(f"  Controls - Geometric mean: {desc_stats['controls_gmean']:.1f}")
         print(f"  Geometric mean ratio: {desc_stats['gmr']:.3f}")
-    
-    # Conditional logistic regression
-    result = fit_conditional_logistic(df_long)
-    
+
+    # Logistic regression (conditional or standard based on config)
+    if config.use_standard_logistic:
+        result = fit_standard_logistic(df_long)
+        regression_type = "Standard Logistic Regression"
+    else:
+        result = fit_conditional_logistic(df_long)
+        regression_type = "Conditional Logistic Regression"
+
     coef = result.params['log_antibody']
     se = result.bse['log_antibody']
     ci_lower = result.conf_int().loc['log_antibody', 0]
     ci_upper = result.conf_int().loc['log_antibody', 1]
     p_value = result.pvalues['log_antibody']
     or_10fold = np.exp(coef)
-    
+
     if verbose:
-        print(f"\nConditional Logistic Regression:")
+        print(f"\n{regression_type}:")
         print(f"  Coefficient: {coef:.3f} (SE: {se:.3f})")
         print(f"  95% CI: [{ci_lower:.3f}, {ci_upper:.3f}]")
         print(f"  P-value: {p_value:.4e}")
@@ -984,8 +1033,8 @@ def run_analysis(config: AssayConfig, verbose: bool = True):
     # Generate predictions
     if verbose:
         print("\nCalculating bootstrap confidence intervals...")
-    
-    if config.use_standard_logistic_for_viz:
+
+    if config.use_standard_logistic:
         ab_range, prob_pred, prob_lower, prob_upper, successful_boots = \
             generate_predictions_standard_logistic(df_long)
     else:

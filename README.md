@@ -1,19 +1,249 @@
-# *E. coli* Natural Immunity 
+# *E. coli* Natural Immunity
 
 Scripts supporting the publication: **"Natural maternal immunity protects neonates from *Escherichia coli* sepsis"**
 
-This repository contains bioinformatics scripts used for whole genome sequencing (WGS) analysis, OmpA protein analysis, and peptide homology studies of *Escherichia coli* strains.
+Diep, R.E., et al. *Nature* (2025).
+
+This repository contains bioinformatics scripts used for whole genome sequencing (WGS) analysis, OmpA protein analysis, peptide homology studies, and statistical analysis of maternal antibody protection against neonatal *E. coli* sepsis.
+
+**Repository:** https://github.com/Way-Lab/ecoli_natural_immunity
+
+---
+
+## System Requirements
+
+### Operating System
+- **Tested on:** Ubuntu 24.04 LTS (Linux)
+- **Compatible with:** Linux distributions (Debian, Ubuntu, CentOS), macOS (with Homebrew/conda)
+- **Note:** Windows users should use WSL2 (Windows Subsystem for Linux)
+
+### Hardware Requirements
+- **Minimum:** 8 GB RAM, 4 CPU cores
+- **Recommended for WGS analysis:** 32 GB RAM, 16 CPU cores
+- **Storage:** ~10 GB for software dependencies; additional space for sequence data
+- No specialized hardware (GPU) required
+
+### Software Dependencies
+
+#### Python (version 3.10+)
+Tested with Python 3.12.10
+
+| Package | Version Tested | Purpose |
+|---------|----------------|---------|
+| pandas | 2.3.3 | Data manipulation |
+| numpy | 2.3.5 | Numerical computing |
+| matplotlib | 3.10.3 | Visualization |
+| seaborn | 0.13.2 | Statistical graphics |
+| scipy | 1.16.3 | Scientific computing |
+| statsmodels | 0.14.5 | Statistical models |
+| biopython | 1.85 | Sequence analysis |
+
+#### Bioinformatics Tools (for WGS analysis)
+| Tool | Purpose | Installation |
+|------|---------|--------------|
+| [Unicycler](https://github.com/rrwick/Unicycler) | Hybrid genome assembly | conda install -c bioconda unicycler |
+| [QUAST](https://github.com/ablab/quast) | Assembly QC | conda install -c bioconda quast |
+| [BUSCO](https://busco.ezlab.org/) | Completeness assessment | conda install -c bioconda busco |
+| [Parsnp](https://harvest.readthedocs.io/) | Core genome alignment | conda install -c bioconda parsnp |
+| [Breseq](https://barricklab.org/breseq) | Mutation identification | conda install -c bioconda breseq |
+| [Bakta](https://github.com/oschwengers/bakta) | Genome annotation | conda install -c bioconda bakta |
+| [MOB-suite](https://github.com/phac-nml/mob-suite) | Plasmid analysis | conda install -c bioconda mob_suite |
+| [MAFFT](https://mafft.cbrc.jp/alignment/software/) | Sequence alignment | conda install -c bioconda mafft |
+
+---
+
+## Installation Guide
+
+### Step 1: Clone the repository
+```bash
+git clone https://github.com/Way-Lab/ecoli_natural_immunity.git
+cd ecoli_natural_immunity
+```
+
+### Step 2: Create Python environment
+Using conda (recommended):
+```bash
+conda create -n ecoli_immunity python=3.12
+conda activate ecoli_immunity
+pip install pandas numpy matplotlib seaborn scipy statsmodels biopython
+```
+
+Or using pip with virtual environment:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install pandas numpy matplotlib seaborn scipy statsmodels biopython
+```
+
+### Step 3: Install bioinformatics tools (optional, for WGS analysis)
+```bash
+conda install -c bioconda unicycler quast busco parsnp breseq bakta mob_suite mafft snp-dists
+```
+
+### Typical Installation Time
+- **Python environment only:** 2-5 minutes
+- **Full installation with bioinformatics tools:** 15-30 minutes
+
+---
+
+## Demo
+
+### Demo 1: Statistical Analysis (Primary Demo)
+
+This demo runs the matched case-control analysis of maternal antibodies.
+
+**Data:** Embedded in script (no external files needed)
+
+**Run command:**
+```bash
+cd statistical_analysis
+python logistic_regression_case_control.py --assay OmpA
+```
+
+**Expected output:**
+```
+======================================================================
+MATCHED CASE-CONTROL ANTIBODY ANALYSIS SUMMARY - OmpA
+======================================================================
+
+SAMPLE SIZE:
+  Cases: 100
+  Controls: 296
+  Matched sets: 100
+
+DESCRIPTIVE STATISTICS:
+  Cases - Geometric mean: 265.4
+  Controls - Geometric mean: 625.4
+  Geometric mean ratio: 2.356
+
+CONDITIONAL LOGISTIC REGRESSION:
+  Coefficient: -1.972 (SE: 0.327)
+  95% CI: [-2.613, -1.331]
+  P-value: 1.6528e-09
+
+ODDS RATIOS:
+  Per 10-fold increase: 0.139
+  Per 2-fold increase: 0.552
+
+PROTECTIVE THRESHOLDS:
+  50% risk reduction: 1346.0
+  75% risk reduction: 3320.6
+  90% risk reduction: 10090.6
+  95% risk reduction: 10327.0
+```
+
+**Output files generated:**
+  - OmpA_antibody_analysis_figure.pdf
+  - OmpA_analysis_summary.txt
+
+**Expected runtime:** < 1 minute on a standard desktop
+
+
+### Demo 2: OmpA Sequence Analysis
+
+**Run command:**
+```bash
+cd ompa_analysis
+python analyze_selected_ompA_strains.py ../demo_data/selected_ompA_sequences.fasta
+```
+
+**Expected output:** Aligned OmpA sequences with peptide loop annotations
+
+**Expected runtime:** < 30 seconds
+
+### Demo 3: Peptide Variability Analysis
+
+**Run command:**
+```bash
+cd peptide_analysis
+python analyze_peptide_variability.py ../demo_data/OmpA_peptide_seqeunces.fasta
+```
+
+**Expected output:** Conservation analysis across peptide sequences
+
+**Expected runtime:** < 30 seconds
+
+### Demo 4: Sequence Alignment Visualization
+
+**Run command:**
+```bash
+cd utilities
+python align_and_visualize.py ../demo_data/unaligned_for_mafft.fasta
+```
+
+**Expected output:** Multiple sequence alignment with visualization
+
+**Expected runtime:** < 1 minute (requires MAFFT installed)
+
+---
+
+## Instructions for Use
+
+### Running on Your Own Data
+
+#### Statistical Analysis
+The statistical analysis script analyzes matched case-control data. To use with your own data:
+
+1. Format your data as tab-separated values with columns: Case, Control1, Control2, Control3
+2. Modify the data strings in `logistic_regression_case_control.py` or adapt the script to read from CSV files
+
+#### OmpA/Peptide Analysis
+For sequence analysis with your own FASTA files:
+
+```bash
+# Extract OmpA sequences from genome assemblies
+python ompa_analysis/extract_ompA.py your_assembly.fasta
+
+# Compare OmpA sequences between strains
+python ompa_analysis/compare_ompA.py strain1.fasta strain2.fasta
+
+# Analyze peptide variability
+python peptide_analysis/analyze_peptide_variability.py your_sequences.fasta
+
+# Generate alignment visualizations
+python utilities/align_and_visualize.py your_sequences.fasta
+```
+
+#### WGS Analysis Pipeline
+For whole genome sequencing analysis:
+
+```bash
+# Hybrid assembly (requires Illumina + Nanopore reads)
+./wgs_analysis/process_hybrid_assembly.sh sample_prefix num_threads
+
+# Assembly quality control
+./wgs_analysis/run_assembly_qc.sh assembly.fasta
+
+# Core genome phylogenetic analysis
+./wgs_analysis/run_parsnp_analysis.sh genome_directory reference.fasta
+
+# Mutation identification
+./wgs_analysis/run_breseq_analysis.sh reads.fastq reference.gbk
+```
+
+---
 
 ## Repository Structure
 
 ```
 ecoli_natural_immunity/
-├── wgs_analysis/           # Whole genome sequencing and assembly pipelines
-│   └── snp_analysis/       # SNP calling and annotation
-├── ompa_analysis/          # OmpA outer membrane protein analysis
-├── peptide_analysis/       # Peptide conservation and variability analysis
-├── statistical_analysis/   # Case-control statistical analysis
-└── utilities/              # FASTA processing and visualization tools
+├── README.md                     # This file
+├── LICENSE                       # MIT License
+├── demo_data/                    # Demo datasets for testing
+│   ├── RS218_ompA.fasta         # Reference OmpA sequence
+│   ├── selected_ompA_sequences.fasta
+│   ├── combined_ompA_all_species.fasta
+│   ├── aligned_sequences_with_SCB_authentic.fasta
+│   ├── OmpA_peptide_seqeunces.fasta
+│   ├── unaligned_for_mafft.fasta
+│   ├── ompA_comparison.fasta
+│   └── rpoS_comparison.fasta
+├── wgs_analysis/                 # Whole genome sequencing pipelines
+├── snp_analysis/                 # SNP identification and annotation
+├── ompa_analysis/                # OmpA protein analysis
+├── peptide_analysis/             # Peptide conservation studies
+├── statistical_analysis/         # Case-control statistical analysis
+└── utilities/                    # FASTA processing and visualization
 ```
 
 ## Directory Contents
@@ -136,33 +366,35 @@ General-purpose scripts for FASTA processing and visualization.
 | `visualize_final_tree.py` | Visualize final phylogenetic tree |
 | `visualize_strains_tree.py` | Visualize strain-specific trees |
 
-## Software Dependencies
+---
 
-### Assembly and QC
-- [Unicycler](https://github.com/rrwick/Unicycler) - Hybrid genome assembly
-- [QUAST](https://github.com/ablab/quast) - Assembly quality assessment
-- [BUSCO](https://busco.ezlab.org/) - Assembly completeness assessment
+## Reproducing Manuscript Results
 
-### Comparative Genomics
-- [Parsnp](https://harvest.readthedocs.io/) - Core genome alignment
-- [Breseq](https://barricklab.org/breseq) - Mutation identification
+The following scripts generate the key results presented in the manuscript:
 
-### Annotation
-- [Bakta](https://github.com/oschwengers/bakta) - Genome annotation
-- [MOB-suite](https://github.com/phac-nml/mob-suite) - Plasmid analysis
+### Statistical Figures (Antibody Analysis)
 
-### Python Libraries
-- Biopython
-- pandas
-- numpy
-- matplotlib
-- seaborn
-- statsmodels
-- scipy
+| Manuscript Figure | Script | Command |
+|-------------------|--------|---------|
+| Fig. 5a-b (THP-1) | `statistical_analysis/logistic_regression_case_control.py` | `python logistic_regression_case_control.py --assay THP1` |
+| Fig. 5c-d (HL60) | `statistical_analysis/logistic_regression_case_control.py` | `python logistic_regression_case_control.py --assay HL60` |
+| Extended Data (Mix8) | `statistical_analysis/logistic_regression_case_control.py` | `python logistic_regression_case_control.py --assay Mix8` |
+| Extended Data (OmpA) | `statistical_analysis/logistic_regression_case_control.py` | `python logistic_regression_case_control.py --assay OmpA` |
+
+### Genomic Analysis
+
+| Analysis | Scripts | Description |
+|----------|---------|-------------|
+| Phylogenetic trees | `wgs_analysis/run_parsnp_analysis.sh` | Core genome alignment and tree construction |
+| SNP analysis | `snp_analysis/create_comprehensive_parsnp_heatmap.py` | SNP distance heatmaps |
+| OmpA conservation | `ompa_analysis/visualize_peptide_conservation.py` | Peptide loop conservation across species |
+| Strain comparisons | `snp_analysis/annotate_snp_effects.py` | Functional SNP annotations |
+
+---
 
 ## Citation
 
-> Diep, R.E., et al.. Natural maternal immunity protects neonates from Escherichia coli sepsis. 2025.
+> Diep, R.E., et al. Natural maternal immunity protects neonates from Escherichia coli sepsis. *Nature* (2025).
 
 ## Software Citations
 
@@ -176,4 +408,4 @@ General-purpose scripts for FASTA processing and visualization.
 
 ## License
 
-These scripts are provided for reproducibility of the published research.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

@@ -164,27 +164,41 @@ def main():
     print()
 
     # Step 1: Filter and combine sequences
-    print("Step 1: Filtering sequences to keep only selected strains...")
+    print("Step 1: Loading and filtering sequences to keep only selected strains...")
 
-    # Read existing sequences (use the most recent alignment file with SCB60/61)
-    existing_file = 'mafft_aligned_with_SCB60_61.fasta'
-    new_file = 'new_ompA_sequences.fasta'
+    # Get input file from command line or use default
+    if len(sys.argv) > 1:
+        input_file = sys.argv[1]
+    else:
+        # Try to use existing files if no argument provided
+        existing_file = 'mafft_aligned_with_SCB60_61.fasta'
+        new_file = 'new_ompA_sequences.fasta'
+        
+        # Extract sequences from existing file (skip MAFFT log at beginning)
+        all_seqs = []
+        
+        for record in SeqIO.parse(existing_file, 'fasta'):
+            # Skip if the record ID looks like MAFFT output
+            if not record.id.startswith('outputhat') and len(str(record.seq)) > 100:
+                # Remove gaps from existing alignment for re-alignment
+                ungapped_seq = str(record.seq).replace('-', '')
+                record.seq = Seq(ungapped_seq)
+                all_seqs.append(record)
+        
+        # Read new sequences
+        new_seqs = list(SeqIO.parse(new_file, 'fasta'))
+        all_seqs.extend(new_seqs)
+    
     filtered_file = 'selected_ompA_sequences.fasta'
 
-    # Extract sequences from existing file (skip MAFFT log at beginning)
-    all_seqs = []
-
-    for record in SeqIO.parse(existing_file, 'fasta'):
-        # Skip if the record ID looks like MAFFT output
-        if not record.id.startswith('outputhat') and len(str(record.seq)) > 100:
-            # Remove gaps from existing alignment for re-alignment
+    # If input file was provided, read sequences from it
+    if len(sys.argv) > 1:
+        all_seqs = []
+        for record in SeqIO.parse(input_file, 'fasta'):
+            # Remove gaps if this is an aligned file
             ungapped_seq = str(record.seq).replace('-', '')
             record.seq = Seq(ungapped_seq)
             all_seqs.append(record)
-
-    # Read new sequences
-    new_seqs = list(SeqIO.parse(new_file, 'fasta'))
-    all_seqs.extend(new_seqs)
 
     print(f"  Loaded {len(all_seqs)} total sequences")
 
