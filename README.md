@@ -163,18 +163,6 @@ python analyze_peptide_variability.py ../demo_data/OmpA_peptide_seqeunces.fasta
 
 **Expected runtime:** < 30 seconds
 
-### Demo 4: Sequence Alignment Visualization
-
-**Run command:**
-```bash
-cd utilities
-python align_and_visualize.py ../demo_data/unaligned_for_mafft.fasta
-```
-
-**Expected output:** Multiple sequence alignment with visualization
-
-**Expected runtime:** < 1 minute (requires MAFFT installed)
-
 ---
 
 ## Instructions for Use
@@ -199,9 +187,6 @@ python ompa_analysis/compare_ompA.py strain1.fasta strain2.fasta
 
 # Analyze peptide variability
 python peptide_analysis/analyze_peptide_variability.py your_sequences.fasta
-
-# Generate alignment visualizations
-python utilities/align_and_visualize.py your_sequences.fasta
 ```
 
 #### WGS Analysis Pipeline
@@ -319,7 +304,6 @@ Python scripts for OmpA outer membrane protein sequence analysis.
 | `download_enterobacteriaceae_ompA.py` | Download OmpA sequences from Enterobacteriaceae via NCBI |
 | `download_specific_ompA_strains.py` | Download OmpA from specific bacterial strains |
 | `plot_cladogram.py` | Plot phylogenetic cladograms from OmpA alignments |
-| `visualize_peptide_conservation.py` | Create conservation heatmaps across Enterobacteriaceae |
 
 ### peptide_analysis/
 
@@ -350,8 +334,6 @@ General-purpose scripts for FASTA processing and visualization.
 
 | Script | Description |
 |--------|-------------|
-| `align_and_visualize.py` | Multiple sequence alignment and visualization |
-| `align_and_visualize_improved.py` | Improved alignment/visualization pipeline |
 | `clean_headers.py` | Clean FASTA sequence headers |
 | `clean_headers_final.py` | Final version of header cleaning |
 | `fix_duplicate_headers.py` | Fix duplicate headers in FASTA files |
@@ -362,9 +344,6 @@ General-purpose scripts for FASTA processing and visualization.
 | `process_fasta.py` | General FASTA processing |
 | `remove_sequences.py` | Remove specific sequences from FASTA |
 | `remove_sequences_from_processed.py` | Remove sequences from processed files |
-| `visualize_tree.py` | Visualize phylogenetic trees |
-| `visualize_final_tree.py` | Visualize final phylogenetic tree |
-| `visualize_strains_tree.py` | Visualize strain-specific trees |
 
 ---
 
