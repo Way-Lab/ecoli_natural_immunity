@@ -360,6 +360,10 @@ General-purpose scripts for FASTA processing and visualization.
 - Katoh, K. & Standley, D. M. MAFFT multiple sequence alignment software version 7: improvements in performance and usability. Mol Biol Evol 30, 772–780 (2013). https://doi.org/10.1093/molbev/mst010
 - Deatherage, D.E., Barrick, J.E. Identification of mutations in laboratory-evolved microbes from next-generation sequencing data using breseq. Methods Mol. Biol. 1151: 165–188 (2014).
 
+## AI Assistance
+
+Source code in this repository was developed with assistance from [Claude Code](https://claude.ai/code) (Anthropic) and verified by David Haslam.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
