@@ -2,7 +2,7 @@
 
 Scripts supporting the publication: **"Natural maternal immunity protects neonates from *Escherichia coli* sepsis"**
 
-Diep, R.E., et al. *Nature* (2025).
+Diep, R.E., et al. *Nature* (2026).
 
 This repository contains bioinformatics scripts used for whole genome sequencing (WGS) analysis, OmpA protein analysis, peptide homology studies, and statistical analysis of maternal antibody protection against neonatal *E. coli* sepsis.
 
