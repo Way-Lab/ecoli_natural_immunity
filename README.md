@@ -208,12 +208,36 @@ For whole genome sequencing analysis:
 
 ---
 
+## Source Data
+
+Source data for all primary data reported in this paper. The data for each main and extended data figure are in separate Excel files, with tabs for each panel.
+
+| File | Description |
+|------|-------------|
+| `SourceData_Fig1.xlsx` | Source data for Figure 1 |
+| `SourceData_Fig2.xlsx` | Source data for Figure 2 |
+| `SourceData_Fig3.xlsx` | Source data for Figure 3 |
+| `SourceData_Fig4.xlsx` | Source data for Figure 4 |
+| `SourceData_Extended_data_Fig1.xlsx` | Source data for Extended Data Figure 1 |
+| `SourceData_Extended_data_Fig2.xlsx` | Source data for Extended Data Figure 2 |
+| `SourceData_Extended_data_Fig3.xlsx` | Source data for Extended Data Figure 3 |
+| `SourceData_Extended_data_Fig4.xlsx` | Source data for Extended Data Figure 4 |
+| `SourceData_Extended_data_Fig5.xlsx` | Source data for Extended Data Figure 5 |
+| `SourceData_Extended_data_Fig6.xlsx` | Source data for Extended Data Figure 6 |
+| `SourceData_Extended_data_Fig7.xlsx` | Source data for Extended Data Figure 7 |
+| `SourceData_Extended_data_Fig8.xlsx` | Source data for Extended Data Figure 8 |
+| `SourceData_Extended_data_Fig9.xlsx` | Source data for Extended Data Figure 9 |
+| `SourceData_Extended_data_Fig10.xlsx` | Source data for Extended Data Figure 10 |
+
+---
+
 ## Repository Structure
 
 ```
 ecoli_natural_immunity/
 ├── README.md                     # This file
 ├── LICENSE                       # MIT License
+├── SourceData/                   # Primary data for all figures
 ├── demo_data/                    # Demo datasets for testing
 │   ├── RS218_ompA.fasta         # Reference OmpA sequence
 │   ├── selected_ompA_sequences.fasta
