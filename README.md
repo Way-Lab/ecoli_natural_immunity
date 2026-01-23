@@ -386,7 +386,7 @@ General-purpose scripts for FASTA processing and visualization.
 
 ## AI Assistance
 
-Source code in this repository was developed with assistance from [Claude Code](https://claude.ai/code) (Anthropic) and verified by David Haslam.
+Source code in this repository was developed with assistance from [Claude Code](https://claude.ai/code) (Anthropic), verified and edited where appropriate by the authors.
 
 ## License
 
