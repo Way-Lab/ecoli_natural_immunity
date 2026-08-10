@@ -69,6 +69,41 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $1"
 }
 
+# Drop assemblies that are not present, rather than handing MOB-suite paths
+# that do not resolve. The SRA deposit (PRJNA1510228) covers the isolates
+# analysed in the paper, so a dataset reconstructed from it yields a subset of
+# the assemblies listed above.
+filter_existing_assemblies() {
+    local present=() missing=() f
+
+    for f in "${N2SKTQ_ASSEMBLIES[@]}"; do
+        if [ -f "${f}" ]; then present+=("${f}"); else missing+=("$(basename "${f}")"); fi
+    done
+    N2SKTQ_ASSEMBLIES=("${present[@]}")
+
+    present=()
+    for f in "${Z6M7Y5_ASSEMBLIES[@]}"; do
+        if [ -f "${f}" ]; then present+=("${f}"); else missing+=("$(basename "${f}")"); fi
+    done
+    Z6M7Y5_ASSEMBLIES=("${present[@]}")
+
+    if [ ${#missing[@]} -gt 0 ]; then
+        log_warning "Assembly not found for ${#missing[@]} sample(s), skipping:"
+        printf '    %s\n' "${missing[@]}"
+        log_warning "If you reconstructed this dataset from SRA, this is expected —"
+        log_warning "see the 'Reproducing from SRA' section of README.md."
+    fi
+
+    local n=$((${#N2SKTQ_ASSEMBLIES[@]} + ${#Z6M7Y5_ASSEMBLIES[@]}))
+    if [ ${n} -eq 0 ]; then
+        log_error "No assemblies found under ${WORKING_DIR}"
+        log_error "Build them first (run_parallel_assemblies.sh,"
+        log_error "run_Z6M7Y5_hybrid_assemblies.sh) or correct WORKING_DIR."
+        exit 1
+    fi
+    log_info "Analysing ${n} assembly/assemblies"
+}
+
 # Create output directory structure
 create_output_dirs() {
     log_info "Creating output directory structure..."
@@ -275,6 +310,7 @@ main() {
     log_info "Output directory: ${OUTPUT_DIR}"
     log_info "Threads: ${THREADS}"
 
+    filter_existing_assemblies
     create_output_dirs
     process_all_assemblies
     annotate_all_plasmids

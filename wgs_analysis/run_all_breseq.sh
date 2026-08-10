@@ -59,11 +59,42 @@ SAMPLES=(
     "N2SKTQ_12_12"
 )
 
-echo "=== Running breseq on all 12 samples ==="
-echo "Samples: ${SAMPLES[@]}"
+# Only samples whose reads are present can be analysed. The SRA deposit
+# (PRJNA1510228) covers the 7 isolates analysed in the paper; the controls,
+# the CFT073 reference isolates, and the superseded runs are not deposited,
+# so a dataset reconstructed from SRA will legitimately lack most of this list.
+# Skip those rather than emitting a breseq failure for each.
+PRESENT=()
+MISSING=()
+for sample in "${SAMPLES[@]}"; do
+    if [ -f "${sample}_illumina_R1.fastq.gz" ] && [ -f "${sample}_illumina_R2.fastq.gz" ]; then
+        PRESENT+=("$sample")
+    else
+        MISSING+=("$sample")
+    fi
+done
+
+if [ ${#MISSING[@]} -gt 0 ]; then
+    echo "Reads not found for ${#MISSING[@]} sample(s), skipping:"
+    printf '  - %s\n' "${MISSING[@]}"
+    echo ""
+    echo "If you assembled this dataset from SRA, this is expected — see the"
+    echo "'Reproducing from SRA' section of README.md."
+    echo ""
+fi
+
+if [ ${#PRESENT[@]} -eq 0 ]; then
+    echo "ERROR: no samples have Illumina reads in $(pwd)" >&2
+    echo "Run wgs_analysis/fetch_sra_reads.sh first, or run this script from" >&2
+    echo "the directory holding the FASTQ files (N2SKTQ_results)." >&2
+    exit 1
+fi
+
+echo "=== Running breseq on ${#PRESENT[@]} sample(s) ==="
+echo "Samples: ${PRESENT[@]}"
 echo ""
 
-for sample in "${SAMPLES[@]}"; do
+for sample in "${PRESENT[@]}"; do
     run_breseq_sample "$sample"
 done
 

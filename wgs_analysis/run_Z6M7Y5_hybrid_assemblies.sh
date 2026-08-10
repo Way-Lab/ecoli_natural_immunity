@@ -89,14 +89,41 @@ run_assembly() {
 export -f run_assembly
 export THREADS ILLUMINA_DIR NANOPORE_DIR OUTPUT_BASE
 
-# Run assemblies in parallel (all 6 samples)
-echo "Starting parallel assemblies for 6 samples..."
+# Assemble only the samples whose prepared reads are present. The SRA deposit
+# (PRJNA1510228) covers the isolates analysed in the paper, so a dataset
+# reconstructed from SRA holds samples 1-4 only.
+SAMPLES=()
+MISSING=()
+for i in {1..6}; do
+    if [ -f "${ILLUMINA_DIR}/Z6M7Y5_${i}_R1.fastq.gz" ] && \
+       [ -f "${NANOPORE_DIR}/Z6M7Y5_${i}_nanopore.fastq.gz" ]; then
+        SAMPLES+=("$i")
+    else
+        MISSING+=("$i")
+    fi
+done
+
+if [ ${#MISSING[@]} -gt 0 ]; then
+    echo "Prepared reads not found for sample(s): ${MISSING[*]} - skipping"
+    echo "If you assembled this dataset from SRA, this is expected — see the"
+    echo "'Reproducing from SRA' section of README.md."
+    echo ""
+fi
+
+if [ ${#SAMPLES[@]} -eq 0 ]; then
+    echo "ERROR: no prepared reads found in ${ILLUMINA_DIR}/ and ${NANOPORE_DIR}/" >&2
+    echo "Run ./fetch_sra_reads.sh (SRA data) or ./prepare_Z6M7Y5_data.sh" >&2
+    echo "(original vendor files) first." >&2
+    exit 1
+fi
+
+echo "Starting parallel assemblies for ${#SAMPLES[@]} sample(s): ${SAMPLES[*]}"
 echo "Each assembly will use ${THREADS} threads"
 echo ""
 
 # Use GNU parallel to run 1 assembly at a time (since each uses many threads)
 # Adjust -j parameter based on your system resources
-parallel -j 1 run_assembly ::: {1..6}
+parallel -j 1 run_assembly ::: "${SAMPLES[@]}"
 
 echo ""
 echo "=========================================="
@@ -106,7 +133,7 @@ echo ""
 echo "Output directory: ${OUTPUT_BASE}/"
 echo ""
 echo "Assembly files:"
-for i in {1..6}; do
+for i in "${SAMPLES[@]}"; do
     ASSEMBLY="${OUTPUT_BASE}/Z6M7Y5_${i}/Z6M7Y5_${i}.fasta"
     if [ -f "${ASSEMBLY}" ]; then
         SIZE=$(du -h "${ASSEMBLY}" | cut -f1)

@@ -60,6 +60,10 @@ log_success() {
     echo -e "${GREEN}[SUCCESS]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $1"
 }
 
+log_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $1"
+}
+
 log_error() {
     echo -e "${RED}[ERROR]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $1"
 }
@@ -115,10 +119,35 @@ log_info "Total threads: ${THREADS}"
 log_info "Parallel jobs: ${JOBS}"
 log_info "Threads per job: $((THREADS / JOBS))"
 
-# Combine all assemblies
-ALL_ASSEMBLIES=("${N2SKTQ_ASSEMBLIES[@]}" "${Z6M7Y5_ASSEMBLIES[@]}")
+# Combine all assemblies, keeping only those that are present. The SRA deposit
+# (PRJNA1510228) covers the isolates analysed in the paper, so a dataset
+# reconstructed from it yields a subset of the assemblies listed above; skip the
+# rest rather than handing MOB-suite paths that do not resolve.
+ALL_ASSEMBLIES=()
+MISSING_ASSEMBLIES=()
+for assembly in "${N2SKTQ_ASSEMBLIES[@]}" "${Z6M7Y5_ASSEMBLIES[@]}"; do
+    if [ -f "${assembly}" ]; then
+        ALL_ASSEMBLIES+=("${assembly}")
+    else
+        MISSING_ASSEMBLIES+=("$(basename "${assembly}")")
+    fi
+done
 
-log_info "===== PHASE 1: Running MOB-suite on all ${#ALL_ASSEMBLIES[@]} assemblies in parallel ====="
+if [ ${#MISSING_ASSEMBLIES[@]} -gt 0 ]; then
+    log_warning "Assembly not found for ${#MISSING_ASSEMBLIES[@]} sample(s), skipping:"
+    printf '    %s\n' "${MISSING_ASSEMBLIES[@]}"
+    log_warning "If you reconstructed this dataset from SRA, this is expected —"
+    log_warning "see the 'Reproducing from SRA' section of README.md."
+fi
+
+if [ ${#ALL_ASSEMBLIES[@]} -eq 0 ]; then
+    log_error "No assemblies found under ${WORKING_DIR}"
+    log_error "Build them first (run_parallel_assemblies.sh,"
+    log_error "run_Z6M7Y5_hybrid_assemblies.sh) or correct WORKING_DIR."
+    exit 1
+fi
+
+log_info "===== PHASE 1: Running MOB-suite on ${#ALL_ASSEMBLIES[@]} assemblies in parallel ====="
 
 # Run MOB-suite in parallel
 printf '%s\n' "${ALL_ASSEMBLIES[@]}" | parallel -j ${JOBS} --progress process_sample_mobsuite {}

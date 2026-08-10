@@ -2,6 +2,12 @@
 # Data preparation script for Z6M7Y5 samples
 # No concatenation needed - data is already consolidated
 # Creates symlinks with simplified names
+#
+# NOTE: this script operates on the ORIGINAL vendor files in Z6M7Y5_results/,
+# whose names embed the IS-YYMMDD-NNN-EX-1 sample accessions. Those accessions
+# are not part of the public SRA deposit, so files downloaded from SRA will not
+# match the globs below. If you are working from SRA, use
+# ./fetch_sra_reads.sh instead — it writes the same prepared layout directly.
 
 set -e
 
@@ -12,6 +18,16 @@ echo "=========================================="
 # Create working directories
 mkdir -p Z6M7Y5_illumina_prepared
 mkdir -p Z6M7Y5_nanopore_prepared
+
+if [ ! -d Z6M7Y5_results ]; then
+    echo ""
+    echo "ERROR: Z6M7Y5_results/ not found."
+    echo ""
+    echo "This script expects the original vendor FASTQ files. To reconstruct"
+    echo "the dataset from the SRA deposit (PRJNA1510228) instead, run:"
+    echo "  ./fetch_sra_reads.sh"
+    exit 1
+fi
 
 cd Z6M7Y5_results
 

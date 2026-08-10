@@ -10,6 +10,31 @@ This repository contains bioinformatics scripts used for whole genome sequencing
 
 ---
 
+## Data Availability
+
+Whole-genome sequencing reads for the seven *E. coli* isolates analysed in this
+study are deposited in the NCBI Sequence Read Archive under BioProject
+**[PRJNA1510228](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1510228)**. Each
+isolate has one paired-end Illumina run (NovaSeq X Plus, 150 bp) and one Oxford
+Nanopore run (PromethION, R10.4.1), for 14 runs in total.
+
+`SRA_file_map.tsv` in this repository maps each deposited file to the internal
+sequencing-run identifier used throughout these scripts, together with its
+BioSample accession. To download the reads and place them where the analysis
+scripts expect:
+
+```bash
+./wgs_analysis/fetch_sra_reads.sh
+```
+
+See [Reproducing from SRA](#reproducing-from-sra) for the full procedure and for
+which analyses can be reproduced from the deposited data.
+
+Source data underlying every main and extended data figure are provided as Excel
+files in [`SourceData/`](#source-data).
+
+---
+
 ## System Requirements
 
 ### Operating System
@@ -205,6 +230,54 @@ For whole genome sequencing analysis:
 # Mutation identification
 ./wgs_analysis/run_breseq_analysis.sh reads.fastq reference.gbk
 ```
+
+---
+
+## Reproducing from SRA
+
+### File naming
+
+Reads are deposited under BioProject **PRJNA1510228** (see
+[Data Availability](#data-availability)).
+
+The deposited files carry public isolate names (`Nissle_Stock-1`,
+`Nissle_Preg-5`, ...), while the scripts in this repository refer to the
+internal sequencing-run IDs (`N2SKTQ_1_1`, `Z6M7Y5_1`, ...). **`SRA_file_map.tsv`**
+in the repository root gives the correspondence between the two, along with
+the BioSample accession and the path each file must occupy for the analysis
+scripts to find it. The same correspondence is recorded on SRA itself: each
+run page lists the internal run ID as its Library Name.
+
+To download the reads and place them where the scripts expect:
+
+```bash
+# Requires the SRA Toolkit: conda install -c bioconda sra-tools
+./wgs_analysis/fetch_sra_reads.sh 8
+```
+
+This writes `N2SKTQ_results/`, `Z6M7Y5_illumina_prepared/`, and
+`Z6M7Y5_nanopore_prepared/` under the current directory. Do **not** run
+`prepare_Z6M7Y5_data.sh` on SRA-derived data — it matches the original vendor
+filenames, which embed sample accessions that are not part of the public
+deposit.
+
+### What cannot be reproduced from SRA alone
+
+The deposit covers the seven isolates the paper analyses. Several scripts
+iterate over the full sequencing batches, which included samples excluded from
+the paper for reasons unrelated to data quality of the deposited runs:
+
+| Not deposited | Reason |
+|---------------|--------|
+| `N2SKTQ_2_2` through `N2SKTQ_8_8`, `N2SKTQ_11_11`, `N2SKTQ_12_12` | Stock replicate, gavage controls, and CFT073 reference isolates (wild-type, *rpoS*, *ompA*) — not Nissle re-isolates |
+| `N2SKTQ_13_13`, `N2SKTQ_14_14` | Superseded by the Preg-5 and Preg-6 runs, which are deposited |
+
+`run_all_breseq.sh`, `run_parallel_assemblies.sh`, and
+`run_Z6M7Y5_hybrid_assemblies.sh` detect the absent reads and skip those
+samples with a message. The SNP and phylogenetic scripts under `snp_analysis/`
+operate on assemblies rather than reads; those that reference the excluded
+samples will produce correspondingly smaller matrices. The isolates above
+appear in none of the paper's SNP distance tables.
 
 ---
 

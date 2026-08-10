@@ -8,7 +8,7 @@ set -e
 
 # Configuration
 TOTAL_CORES=128
-SAMPLES_TO_PROCESS=(2 3 4 5 6 7 8 9 10 11 12)  # Skip 1 (running), 13, 14 (bad quality)
+SAMPLES_TO_PROCESS=(2 3 4 5 6 7 8 9 10 11 12)  # 1 assembled separately; 13, 14 superseded
 
 # Calculate optimal parallelization
 NUM_SAMPLES=${#SAMPLES_TO_PROCESS[@]}
