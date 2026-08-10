@@ -261,16 +261,6 @@ This writes `N2SKTQ_results/`, `Z6M7Y5_illumina_prepared/`, and
 filenames, which embed sample accessions that are not part of the public
 deposit.
 
-### What cannot be reproduced from SRA alone
-
-The deposit covers the seven isolates the paper analyses. Several scripts
-iterate over the full sequencing batches, which included samples excluded from
-the paper for reasons unrelated to data quality of the deposited runs:
-
-| Not deposited | Reason |
-|---------------|--------|
-| `N2SKTQ_2_2` through `N2SKTQ_8_8`, `N2SKTQ_11_11`, `N2SKTQ_12_12` | Stock replicate, gavage controls, and CFT073 reference isolates (wild-type, *rpoS*, *ompA*) — not Nissle re-isolates |
-| `N2SKTQ_13_13`, `N2SKTQ_14_14` | Superseded by the Preg-5 and Preg-6 runs, which are deposited |
 
 `run_all_breseq.sh`, `run_parallel_assemblies.sh`, and
 `run_Z6M7Y5_hybrid_assemblies.sh` detect the absent reads and skip those
