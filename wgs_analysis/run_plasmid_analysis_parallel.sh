@@ -6,18 +6,38 @@
 
 set -u
 
-# Configuration
-WORKING_DIR="/fastpool/active_data/ecoli_genomics"
-OUTPUT_DIR="${WORKING_DIR}/plasmid_analysis_results"
-THREADS=32
-JOBS=6  # Number of parallel jobs (adjust based on available resources)
+# Configuration. Every setting can be overridden from the environment, e.g.
+#   WORKING_DIR=/data/ecoli BAKTA_DB=/refs/bakta/db THREADS=16 ./run_plasmid_analysis_parallel.sh
+WORKING_DIR="${WORKING_DIR:-$(pwd)}"      # holds N2SKTQ_results/ and Z6M7Y5_assemblies/
+OUTPUT_DIR="${OUTPUT_DIR:-${WORKING_DIR}/plasmid_analysis_results}"
+THREADS="${THREADS:-32}"
+JOBS="${JOBS:-6}"  # Number of parallel jobs (adjust based on available resources)
 
 # Conda environments
-MOBSUITE_ENV="mobsuite"
-BAKTA_ENV="bakta"
+MOBSUITE_ENV="${MOBSUITE_ENV:-mobsuite}"
+BAKTA_ENV="${BAKTA_ENV:-bakta}"
 
-# Bakta database location
-BAKTA_DB="/bulkpool/reference_data/bakta_db/db"
+# Bakta database. No portable default exists — set BAKTA_DB to the directory
+# produced by `bakta_db download`.
+BAKTA_DB="${BAKTA_DB:-}"
+
+# Locate the conda installation instead of assuming an install prefix, so the
+# script works with miniforge, miniconda, or a system-wide install.
+if [ -z "${CONDA_BASE:-}" ]; then
+    if [ -n "${CONDA_EXE:-}" ]; then
+        CONDA_BASE="$(dirname "$(dirname "${CONDA_EXE}")")"
+    elif command -v conda >/dev/null 2>&1; then
+        CONDA_BASE="$(conda info --base)"
+    else
+        echo "ERROR: conda not found. Install conda/miniforge, or set CONDA_BASE" >&2
+        echo "to the installation prefix (the directory holding etc/profile.d/conda.sh)." >&2
+        exit 1
+    fi
+fi
+if [ ! -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]; then
+    echo "ERROR: ${CONDA_BASE}/etc/profile.d/conda.sh not found" >&2
+    exit 1
+fi
 
 # Assembly locations
 N2SKTQ_ASSEMBLIES=(
@@ -80,7 +100,8 @@ process_sample_mobsuite() {
     echo "[$(date '+%H:%M:%S')] Starting MOB-suite for ${sample_name}"
 
     # Activate MOB-suite environment
-    source /home/david/miniforge3/bin/activate ${MOBSUITE_ENV} 2>/dev/null || true
+    source "${CONDA_BASE}/etc/profile.d/conda.sh"
+    conda activate "${MOBSUITE_ENV}" 2>/dev/null || true
 
     # Run mob_recon
     mob_recon \
@@ -110,7 +131,7 @@ process_sample_mobsuite() {
 
 # Export function and variables for parallel
 export -f process_sample_mobsuite
-export OUTPUT_DIR MOBSUITE_ENV THREADS JOBS
+export OUTPUT_DIR MOBSUITE_ENV THREADS JOBS CONDA_BASE
 
 log_info "===== Starting Parallel Plasmid Analysis Pipeline ====="
 log_info "Working directory: ${WORKING_DIR}"
@@ -169,7 +190,8 @@ annotate_plasmid() {
     mkdir -p "${output_dir}"
 
     # Activate Bakta environment
-    source /home/david/miniforge3/bin/activate ${BAKTA_ENV} 2>/dev/null || true
+    source "${CONDA_BASE}/etc/profile.d/conda.sh"
+    conda activate "${BAKTA_ENV}" 2>/dev/null || true
 
     bakta \
         --db "${BAKTA_DB}" \
@@ -189,7 +211,14 @@ annotate_plasmid() {
 }
 
 export -f annotate_plasmid
-export BAKTA_ENV BAKTA_DB
+export BAKTA_ENV BAKTA_DB CONDA_BASE
+
+if [ -z "${BAKTA_DB}" ] || [ ! -d "${BAKTA_DB}" ]; then
+    log_error "Bakta database not set or not found: '${BAKTA_DB}'"
+    log_error "Set BAKTA_DB to the directory produced by 'bakta_db download'."
+    log_error "MOB-suite results are complete and in ${OUTPUT_DIR}/mobsuite_results/"
+    exit 1
+fi
 
 # Find all plasmid FASTA files and annotate in parallel
 find "${OUTPUT_DIR}/mobsuite_results" -name "plasmid_*.fasta" | \

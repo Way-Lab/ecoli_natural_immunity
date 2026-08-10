@@ -230,6 +230,30 @@ For whole genome sequencing analysis:
 ./wgs_analysis/run_breseq_analysis.sh reads.fastq reference.gbk
 ```
 
+#### Plasmid analysis
+
+The two plasmid scripts take their paths from the environment, so they run
+without editing. `WORKING_DIR` defaults to the current directory and must
+contain `N2SKTQ_results/` and `Z6M7Y5_assemblies/`. `BAKTA_DB` has no default
+and must point at the database directory created by `bakta_db download`:
+
+```bash
+BAKTA_DB=/path/to/bakta/db ./wgs_analysis/run_plasmid_analysis_parallel.sh
+```
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `WORKING_DIR` | current directory | Holds the assembly directories |
+| `OUTPUT_DIR` | `$WORKING_DIR/plasmid_analysis_results` | Where results are written |
+| `BAKTA_DB` | *(none — required for annotation)* | Bakta database directory |
+| `THREADS` | 32 | Total threads |
+| `JOBS` | 6 | Concurrent jobs (parallel script only) |
+| `MOBSUITE_ENV`, `BAKTA_ENV` | `mobsuite`, `bakta` | Conda environment names |
+| `CONDA_BASE` | auto-detected | Conda install prefix, if detection fails |
+
+MOB-suite runs before Bakta, so an unset `BAKTA_DB` still produces complete
+plasmid reconstruction and typing results; only the annotation phase stops.
+
 ---
 
 ## Reproducing from SRA
