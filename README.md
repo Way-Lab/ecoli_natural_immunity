@@ -261,13 +261,11 @@ This writes `N2SKTQ_results/`, `Z6M7Y5_illumina_prepared/`, and
 filenames, which embed sample accessions that are not part of the public
 deposit.
 
-
 `run_all_breseq.sh`, `run_parallel_assemblies.sh`, and
 `run_Z6M7Y5_hybrid_assemblies.sh` detect the absent reads and skip those
 samples with a message. The SNP and phylogenetic scripts under `snp_analysis/`
-operate on assemblies rather than reads; those that reference the excluded
-samples will produce correspondingly smaller matrices. The isolates above
-appear in none of the paper's SNP distance tables.
+operate on assemblies rather than reads; those that reference samples outside
+the deposit will produce correspondingly smaller matrices.
 
 ---
 
