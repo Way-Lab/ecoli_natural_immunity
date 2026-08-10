@@ -192,7 +192,6 @@ python analyze_peptide_variability.py ../demo_data/OmpA_peptide_seqeunces.fasta
 
 ## Instructions for Use
 
-### Running on Your Own Data
 
 #### Statistical Analysis
 The statistical analysis script analyzes matched case-control data. To use with your own data:
